@@ -1,37 +1,691 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+<!doctype html>
+<html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Título da Página - Exemplo</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        header { background-color: #f4f4f4; padding: 1rem; text-align: center; }
-        nav { background: #333; color: white; padding: 0.5rem; text-align: center; }
-        main { padding: 2rem; }
-        footer { background-color: #f4f4f4; text-align: center; padding: 1rem; position: fixed; bottom: 0; width: 100%; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DevOps — Cultura, Automação e Entrega Contínua</title>
+  <meta name="description" content="Um pequeno site sobre DevOps: conceitos, práticas, ferramentas e um pipeline CI/CD." />
+  <style>
+    :root{
+      --bg: #0b1220;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.10);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --line: rgba(255,255,255,.12);
+      --brand: #6ee7ff;
+      --brand2:#a78bfa;
+      --ok:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius: 18px;
+      --max: 1080px;
+    }
+
+    *{ box-sizing:border-box; }
+    html{ scroll-behavior:smooth; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 10% 10%, rgba(110,231,255,.16), transparent 55%),
+        radial-gradient(700px 450px at 90% 15%, rgba(167,139,250,.18), transparent 50%),
+        radial-gradient(900px 550px at 50% 90%, rgba(52,211,153,.10), transparent 55%),
+        var(--bg);
+      line-height:1.55;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    .container{ width:min(var(--max), calc(100% - 40px)); margin:0 auto; }
+
+    /* Top bar */
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(to bottom, rgba(11,18,32,.75), rgba(11,18,32,.35));
+      border-bottom:1px solid var(--line);
+    }
+    .topbar .row{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 0;
+      gap:16px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:700; letter-spacing:.2px;
+    }
+    .logo{
+      width:34px; height:34px; border-radius:12px;
+      background: linear-gradient(135deg, rgba(110,231,255,.95), rgba(167,139,250,.95));
+      box-shadow: 0 10px 30px rgba(110,231,255,.12);
+      display:grid; place-items:center;
+      font-weight:900; color:#091225;
+    }
+    nav{
+      display:flex; align-items:center; gap:14px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    nav a{
+      font-size:14px;
+      color:var(--muted);
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid transparent;
+    }
+    nav a:hover{
+      color:var(--text);
+      background: rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.10);
+    }
+    .cta{
+      display:inline-flex; align-items:center; gap:10px;
+      background: linear-gradient(135deg, rgba(110,231,255,.95), rgba(167,139,250,.95));
+      color:#091225;
+      font-weight:700;
+      padding:10px 14px;
+      border-radius:12px;
+      box-shadow: var(--shadow);
+      border:0;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .cta:active{ transform: translateY(1px); }
+
+    /* Hero */
+    .hero{ padding:56px 0 28px; }
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:22px;
+      align-items:stretch;
+    }
+    .headline{
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      padding:26px;
+      box-shadow: var(--shadow);
+    }
+    .kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+      font-size:13px;
+      margin-bottom:14px;
+    }
+    h1{
+      margin:0 0 10px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height:1.12;
+      letter-spacing:-.6px;
+    }
+    .sub{
+      margin:0 0 18px;
+      color:var(--muted);
+      font-size:16px;
+      max-width: 62ch;
+    }
+    .btnrow{ display:flex; gap:12px; flex-wrap:wrap; }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      font-weight:650;
+      cursor:pointer;
+    }
+    .btn:hover{ background: rgba(255,255,255,.09); }
+    .btn.primary{
+      border:0;
+      color:#091225;
+      background: linear-gradient(135deg, rgba(110,231,255,.95), rgba(167,139,250,.95));
+    }
+
+    .side{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      padding:22px;
+      box-shadow: var(--shadow);
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .metric{
+      display:flex; align-items:flex-start; justify-content:space-between;
+      gap:12px;
+      padding:14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    .metric strong{ font-size:15px; }
+    .metric span{ color:var(--muted); font-size:13px; display:block; margin-top:3px; }
+    .pill{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      color:var(--muted);
+      white-space:nowrap;
+    }
+
+    /* Sections */
+    section{ padding:26px 0; }
+    .section-head{
+      display:flex; align-items:flex-end; justify-content:space-between;
+      gap:16px;
+      margin-bottom:14px;
+    }
+    h2{
+      margin:0;
+      font-size:22px;
+      letter-spacing:-.2px;
+    }
+    .hint{ margin:0; color:var(--muted); font-size:14px; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:14px;
+    }
+    .card{
+      grid-column: span 4;
+      background: rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      padding:18px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.25);
+    }
+    .card h3{
+      margin:0 0 8px;
+      font-size:16px;
+      letter-spacing:-.2px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .card p{ margin:0; color:var(--muted); font-size:14px; }
+    .icon{
+      width:28px; height:28px; border-radius:10px;
+      display:grid; place-items:center;
+      background: rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);
+    }
+
+    /* Pipeline */
+    .pipeline{
+      grid-column: span 12;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      padding:18px;
+      overflow:auto;
+    }
+    .steps{
+      display:flex; gap:12px; align-items:center;
+      min-width: 860px;
+    }
+    .step{
+      flex: 0 0 auto;
+      display:flex; flex-direction:column;
+      gap:6px;
+      padding:12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      min-width: 160px;
+    }
+    .step .t{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      font-weight:700; font-size:13px;
+    }
+    .step .d{ color:var(--muted); font-size:12px; }
+    .arrow{
+      color: rgba(255,255,255,.5);
+      font-size:18px;
+      flex: 0 0 auto;
+    }
+    .badge{
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      color:var(--muted);
+    }
+    .b-ok{ border-color: rgba(52,211,153,.45); color: rgba(52,211,153,.95); background: rgba(52,211,153,.10); }
+    .b-warn{ border-color: rgba(251,191,36,.45); color: rgba(251,191,36,.95); background: rgba(251,191,36,.10); }
+    .b-bad{ border-color: rgba(251,113,133,.45); color: rgba(251,113,133,.95); background: rgba(251,113,133,.10); }
+
+    /* Tools list */
+    .tools{
+      grid-column: span 12;
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:14px;
+    }
+    .tools .card{ grid-column: span 3; }
+    .tagrow{
+      display:flex; gap:8px; flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .tag{
+      font-size:12px;
+      padding:5px 9px;
+      border-radius:999px;
+      background: rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--muted);
+    }
+
+    /* Footer */
+    footer{
+      padding:34px 0 44px;
+      border-top:1px solid var(--line);
+      color:var(--muted);
+      font-size:13px;
+    }
+    .footergrid{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .tiny{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px){
+      .hero-grid{ grid-template-columns: 1fr; }
+      .card{ grid-column: span 6; }
+      .tools .card{ grid-column: span 6; }
+    }
+    @media (max-width: 620px){
+      nav{ display:none; }
+      .card{ grid-column: span 12; }
+      .tools .card{ grid-column: span 12; }
+      .section-head{ flex-direction:column; align-items:flex-start; }
+    }
+  </style>
 </head>
+
 <body>
+  <header class="topbar">
+    <div class="container">
+      <div class="row">
+        <div class="brand" aria-label="DevOps">
+          <div class="logo" aria-hidden="true">D</div>
+          <div>
+            <div style="font-size:14px; line-height:1;">DevOps</div>
+            <div style="font-size:12px; color:var(--muted); margin-top:2px;">Cultura • Automação • Confiabilidade</div>
+          </div>
+        </div>
 
-    <header>
-        <h1>Logotipo / Nome do Site</h1>
-    </header>
+        <nav aria-label="Navegação">
+          <a href="#conceito">Conceito</a>
+          <a href="#praticas">Práticas</a>
+          <a href="#pipeline">CI/CD</a>
+          <a href="#ferramentas">Ferramentas</a>
+          <a href="#comecar">Como começar</a>
+        </nav>
 
-    <nav>
-        <a href="#" style="color: white; margin: 0 10px;">Início</a> |
-        <a href="#" style="color: white; margin: 0 10px;">Sobre</a> |
-        <a href="#" style="color: white; margin: 0 10px;">Contato</a>
-    </nav>
+        <a class="cta" href="#comecar" title="Ir para Como começar">
+          <span aria-hidden="true">🚀</span> Começar
+        </a>
+      </div>
+    </div>
+  </header>
 
-    <main>
-        <h2>Conteúdo Principal</h2>
-        <p>Este é um parágrafo de exemplo no conteúdo principal.</p>
-    </main>
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="headline">
+            <div class="kicker">
+              <span aria-hidden="true">⚙️</span>
+              <span>Da ideia ao deploy, com feedback rápido e baixo risco</span>
+            </div>
 
-    <footer>
-        <p>&copy; 2026 Meu Exemplo de Site</p>
-    </footer>
+            <h1>DevOps é alinhar pessoas, processos e plataformas para entregar software com confiança.</h1>
+            <p class="sub">
+              Mais do que ferramentas: DevOps une Desenvolvimento e Operações para aumentar a frequência de entrega,
+              reduzir falhas e acelerar a recuperação — usando automação, observabilidade e melhoria contínua.
+            </p>
 
+            <div class="btnrow">
+              <a class="btn primary" href="#pipeline"><span aria-hidden="true">🧪</span> Ver pipeline CI/CD</a>
+              <a class="btn" href="#praticas"><span aria-hidden="true">📌</span> Práticas-chave</a>
+              <a class="btn" href="#ferramentas"><span aria-hidden="true">🧰</span> Ferramentas</a>
+            </div>
+          </div>
+
+          <aside class="side" aria-label="Resumo">
+            <div class="metric">
+              <div>
+                <strong>Objetivo</strong>
+                <span>Entregas pequenas, frequentes e rastreáveis.</span>
+              </div>
+              <div class="pill">Lead Time ↓</div>
+            </div>
+            <div class="metric">
+              <div>
+                <strong>Qualidade</strong>
+                <span>Testes, segurança e validações automatizadas.</span>
+              </div>
+              <div class="pill">Mudanças seguras</div>
+            </div>
+            <div class="metric">
+              <div>
+                <strong>Confiabilidade</strong>
+                <span>Observabilidade, SLOs e resposta a incidentes.</span>
+              </div>
+              <div class="pill">MTTR ↓</div>
+            </div>
+            <div class="metric">
+              <div>
+                <strong>Escala</strong>
+                <span>Infra as Code e containers/orquestração.</span>
+              </div>
+              <div class="pill">Automação ↑</div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="conceito">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Conceito</h2>
+            <p class="hint">DevOps = fluxo contínuo + responsabilidade partilhada + feedback rápido.</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <article class="card">
+            <h3><span class="icon" aria-hidden="true">🤝</span> Cultura</h3>
+            <p>Colaboração entre equipas, ownership end-to-end e aprendizagem a partir de incidentes (postmortems sem culpa).</p>
+          </article>
+
+          <article class="card">
+            <h3><span class="icon" aria-hidden="true">🤖</span> Automação</h3>
+            <p>Build, testes, deploy e infraestrutura codificados e repetíveis — menos trabalho manual, menos variabilidade.</p>
+          </article>
+
+          <article class="card">
+            <h3><span class="icon" aria-hidden="true">📈</span> Observabilidade</h3>
+            <p>Métricas, logs e traces para entender o sistema em produção e reduzir o tempo até ao diagnóstico.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="praticas">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Práticas essenciais</h2>
+            <p class="hint">As “alavancas” que normalmente trazem o maior retorno.</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <article class="card">
+            <h3><span class="icon" aria-hidden="true">🔁</span> Integração Contínua (CI)</h3>
+            <p>Commits frequentes, build automatizado, testes e validações em cada mudança.</p>
+          </article>
+
+          <article class="card">
+            <h3><span class="icon" aria-hidden="true">🚚</span> Entrega/Deploy Contínuo (CD)</h3>
+            <p>Release pipelines com gates, deploy progressivo (canary/blue-green) e rollback rápido.</p>
+          </article>
+
+          <article class="card">
+            <h3><span class="icon" aria-hidden="true">🏗️</span> Infraestrutura como Código (IaC)</h3>
+            <p>Ambientes versionados e reprodutíveis; drift control e alterações auditáveis.</p>
+          </article>
+
+          <article class="card">
+            <h3><span class="icon" aria-hidden="true">🛡️</span> DevSecOps</h3>
+            <p>Segurança “shift-left”: SAST/DAST, scanning de dependências e policy-as-code no pipeline.</p>
+          </article>
+
+          <article class="card">
+            <h3><span class="icon" aria-hidden="true">📡</span> SRE / Confiabilidade</h3>
+            <p>SLOs/SLIs, error budgets, capacity planning e resposta a incidentes com runbooks.</p>
+          </article>
+
+          <article class="card">
+            <h3><span class="icon" aria-hidden="true">🧪</span> Qualidade contínua</h3>
+            <p>Testes unitários, integração, contrato, e2e; ambientes efémeros e dados de teste controlados.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="pipeline">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Exemplo de pipeline CI/CD</h2>
+            <p class="hint">Uma visão típica (pode variar por stack e maturidade).</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="pipeline" role="region" aria-label="Pipeline CI/CD">
+            <div class="steps">
+              <div class="step">
+                <div class="t">Commit <span class="badge b-ok">gatilho</span></div>
+                <div class="d">Push para o repositório</div>
+              </div>
+              <div class="arrow" aria-hidden="true">→</div>
+              <div class="step">
+                <div class="t">Build <span class="badge b-ok">rápido</span></div>
+                <div class="d">Compilar / empacotar</div>
+              </div>
+              <div class="arrow" aria-hidden="true">→</div>
+              <div class="step">
+                <div class="t">Testes <span class="badge b-warn">qualidade</span></div>
+                <div class="d">Unit + integração</div>
+              </div>
+              <div class="arrow" aria-hidden="true">→</div>
+              <div class="step">
+                <div class="t">Security <span class="badge b-warn">policy</span></div>
+                <div class="d">SAST / deps / secrets</div>
+              </div>
+              <div class="arrow" aria-hidden="true">→</div>
+              <div class="step">
+                <div class="t">Artefacto <span class="badge b-ok">versionado</span></div>
+                <div class="d">Imagem/container ou pacote</div>
+              </div>
+              <div class="arrow" aria-hidden="true">→</div>
+              <div class="step">
+                <div class="t">Deploy <span class="badge b-ok">staging</span></div>
+                <div class="d">IaC + configs</div>
+              </div>
+              <div class="arrow" aria-hidden="true">→</div>
+              <div class="step">
+                <div class="t">Validação <span class="badge b-warn">gates</span></div>
+                <div class="d">Smoke + e2e + aprovações</div>
+              </div>
+              <div class="arrow" aria-hidden="true">→</div>
+              <div class="step">
+                <div class="t">Produção <span class="badge b-bad">controle</span></div>
+                <div class="d">Canary/blue-green + rollback</div>
+              </div>
+              <div class="arrow" aria-hidden="true">→</div>
+              <div class="step">
+                <div class="t">Observability <span class="badge b-ok">feedback</span></div>
+                <div class="d">Métricas, logs, alertas</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="grid-column: span 6;">
+            <h3><span class="icon" aria-hidden="true">✅</span> Boas práticas no pipeline</h3>
+            <p>
+              Mantenha a pipeline rápida (especialmente CI), use caches, falhe cedo, e trate o pipeline como código.
+              Prefira deploy progressivo com telemetria e limites claros de rollback.
+            </p>
+          </div>
+
+          <div class="card" style="grid-column: span 6;">
+            <h3><span class="icon" aria-hidden="true">📏</span> Métricas úteis</h3>
+            <p>
+              Frequência de deploy, lead time, taxa de falhas em mudanças e MTTR (tempo médio para recuperação).
+              Estas métricas ajudam a guiar melhorias sem “acharismos”.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ferramentas">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Ferramentas comuns</h2>
+            <p class="hint">Escolha o mínimo que resolve — e integre bem.</p>
+          </div>
+        </div>
+
+        <div class="tools">
+          <article class="card">
+            <h3><span class="icon" aria-hidden="true">🗂️</span> SCM</h3>
+            <p>Repositórios, branching, PRs e code review.</p>
+            <div class="tagrow">
+              <span class="tag">Git</span><span class="tag">PR</span><span class="tag">Code Review</span>
+            </div>
+          </article>
+
+          <article class="card">
+            <h3><span class="icon" aria-hidden="true">🧱</span> CI</h3>
+            <p>Build/test automatizados, checks e artefactos.</p>
+            <div class="tagrow">
+              <span class="tag">Pipelines</span><span class="tag">Caches</span><span class="tag">Runners</span>
+            </div>
+          </article>
+
+          <article class="card">
+            <h3><span class="icon" aria-hidden="true">📦</span> Containers</h3>
+            <p>Empacotar apps e dependências de forma consistente.</p>
+            <div class="tagrow">
+              <span class="tag">Docker</span><span class="tag">Images</span><span class="tag">Registry</span>
+            </div>
+          </article>
+
+          <article class="card">
+            <h3><span class="icon" aria-hidden="true">🧭</span> Orquestração</h3>
+            <p>Escala, rollout, service discovery e auto-healing.</p>
+            <div class="tagrow">
+              <span class="tag">Kubernetes</span><span class="tag">Helm</span><span class="tag">Ingress</span>
+            </div>
+          </article>
+
+          <article class="card">
+            <h3><span class="icon" aria-hidden="true">🏗️</span> IaC</h3>
+            <p>Provisionamento e mudanças infra versionadas.</p>
+            <div class="tagrow">
+              <span class="tag">Terraform</span><span class="tag">Ansible</span><span class="tag">GitOps</span>
+            </div>
+          </article>
+
+          <article class="card">
+            <h3><span class="icon" aria-hidden="true">📊</span> Observabilidade</h3>
+            <p>Dashboards, alertas e tracing distribuído.</p>
+            <div class="tagrow">
+              <span class="tag">Metrics</span><span class="tag">Logs</span><span class="tag">Tracing</span>
+            </div>
+          </article>
+
+          <article class="card">
+            <h3><span class="icon" aria-hidden="true">🛡️</span> Segurança</h3>
+            <p>Scanning e políticas como código no SDLC.</p>
+            <div class="tagrow">
+              <span class="tag">SAST</span><span class="tag">DAST</span><span class="tag">Secrets</span>
+            </div>
+          </article>
+
+          <article class="card">
+            <h3><span class="icon" aria-hidden="true">📣</span> ChatOps</h3>
+            <p>Operações e automação via chat e comandos.</p>
+            <div class="tagrow">
+              <span class="tag">Runbooks</span><span class="tag">Bots</span><span class="tag">Auditoria</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="comecar">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Como começar</h2>
+            <p class="hint">Um caminho simples e pragmático.</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <article class="card" style="grid-column: span 6;">
+            <h3><span class="icon" aria-hidden="true">1️⃣</span> Automatize o básico</h3>
+            <p>
+              Comece com CI: build + testes + lint em cada PR. Depois, padronize artefactos (versões e changelog).
+            </p>
+          </article>
+
+          <article class="card" style="grid-column: span 6;">
+            <h3><span class="icon" aria-hidden="true">2️⃣</span> Infra como código</h3>
+            <p>
+              Garanta reprodutibilidade: ambientes declarativos, revisão por PR, e controlo de alterações (drift).
+            </p>
+          </article>
+
+          <article class="card" style="grid-column: span 6;">
+            <h3><span class="icon" aria-hidden="true">3️⃣</span> Deploy seguro</h3>
+            <p>
+              Introduza staging, smoke tests, deploy progressivo e rollback automático baseado em métricas.
+            </p>
+          </article>
+
+          <article class="card" style="grid-column: span 6;">
+            <h3><span class="icon" aria-hidden="true">4️⃣</span> Observabilidade e SLOs</h3>
+            <p>
+              Instrumente serviços, defina SLIs/SLOs, e crie alertas acionáveis. Postmortems para aprender e ajustar.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footergrid">
+        <div>
+          <strong style="color:var(--text);">Mini-site DevOps</strong>
+          <div style="margin-top:4px;">Feito com HTML + CSS (sem dependências).</div>
+        </div>
+        <div class="tiny">
+          <span class="pill">Responsivo</span>
+          <span class="pill">Acessível</span>
+          <span class="pill">Pronto para editar</span>
+        </div>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
